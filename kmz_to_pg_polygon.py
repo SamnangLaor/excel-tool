@@ -2,11 +2,14 @@ import geopandas as gpd
 import fiona
 import zipfile
 import os
+import pyogrio
+import pandas as pd
 
 # Assuming your KMZ file is named 'my_polygon.kmz'
-kmz_file_path = './public/files/kmz/war-zone.kmz'
+kmz_file_path = './public/files/kmz/invaded-zone.kmz'
 kml_file_path = 'doc.kml' # The default KML file name inside a KMZ
-output_sql_path = './public/files/kmz-sql/polygon.sql'
+output_sql_path = './public/files/kmz-sql/invaded-zone.sql'
+all_layer = {}
 
 # Decompress the KMZ file
 with zipfile.ZipFile(kmz_file_path, 'r') as kmz:
@@ -18,15 +21,19 @@ fiona.drvsupport.supported_drivers['KML'] = 'rw'
 # Optional: KMZ (not always directly supported)
 fiona.drvsupport.supported_drivers['LIBKML'] = 'rw'
 
+layers = pyogrio.list_layers(kml_file_path)
+
+for layer_name, _ in layers:
+    gdf = gpd.read_file(kml_file_path, driver="KML", layer=layer_name)
+    all_layer[layer_name] = gdf
+
+    print(layer_name)
+
 # Read the KML file into a GeoDataFrame
-gdf = gpd.read_file(kml_file_path, driver="KML")
+# gdf_all = pd.concat(all_layer.values(), ignore_index=True)
 
 # Clean up the extracted KML file
 os.remove(kml_file_path)
-
-# The GeoDataFrame now holds your polygon data
-# For a single polygon, you can get the geometry directly
-polygon_geometry = gdf.iloc[0].geometry
 
 # Write result to file
 with open(output_sql_path, 'w', encoding='utf-8') as f:

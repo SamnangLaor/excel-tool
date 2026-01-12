@@ -233,7 +233,7 @@ class ConverterApp(QWidget):
             return
 
         if not self.fileNameInput.text().endswith(ALLOW_FILE_EXTENSION):
-            self.showPopUp(VALIDATION_ERROR, f'Only {', '.join(ALLOW_FILE_EXTENSION)} file are allowed', QMessageBox.Warning)
+            self.showPopUp(VALIDATION_ERROR, f"Only {', '.join(ALLOW_FILE_EXTENSION)} file are allowed", QMessageBox.Warning)
             button.setEnabled(True)
             return
 
